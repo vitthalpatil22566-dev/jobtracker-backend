@@ -1,4 +1,3 @@
-
 package com.jobtracker.repository;
 
 import com.jobtracker.entity.Job;
