@@ -1,4 +1,3 @@
-
 package com.jobtracker.entity;
 
 import jakarta.persistence.*;
@@ -20,10 +19,16 @@ public class Job {
     private Long id;
 
     private String company;
+
     private String position;
+
     private String status;
+
     private LocalDate appliedDate;
+
     private String location;
+
     private String jobType;
+
     private String notes;
 }
