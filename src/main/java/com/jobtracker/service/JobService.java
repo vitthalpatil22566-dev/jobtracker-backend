@@ -1,61 +1,68 @@
-
-package com.jobtracker.service;
+package com.jobtracker.controller;
 
 import com.jobtracker.entity.Job;
-import com.jobtracker.repository.JobRepository;
-import org.springframework.stereotype.Service;
+import com.jobtracker.service.JobService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Service
-public class JobService {
+@RestController
+@RequestMapping("/api/jobs")
+@CrossOrigin(origins = "*")
+public class JobController {
 
-    private final JobRepository jobRepository;
+    private final JobService jobService;
 
-    public JobService(JobRepository jobRepository) {
-        this.jobRepository = jobRepository;
+    public JobController(JobService jobService) {
+        this.jobService = jobService;
     }
 
+    // GET all jobs
+    @GetMapping
     public List<Job> getAllJobs() {
-        return jobRepository.findAll();
+        return jobService.getAllJobs();
     }
 
-    public Job getJobById(Long id) {
-        return jobRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Job not found"));
+    // GET job by ID
+    @GetMapping("/{id}")
+    public ResponseEntity<Job> getJobById(@PathVariable Long id) {
+        return ResponseEntity.ok(jobService.getJobById(id));
     }
 
-    public Job createJob(Job job) {
-        return jobRepository.save(job);
+    // CREATE job
+    @PostMapping
+    public ResponseEntity<Job> createJob(@RequestBody Job job) {
+        return ResponseEntity.ok(jobService.createJob(job));
     }
 
-    public Job updateJob(Long id, Job updatedJob) {
-        Job existingJob = getJobById(id);
+    // UPDATE job
+    @PutMapping("/{id}")
+    public ResponseEntity<Job> updateJob(
+            @PathVariable Long id,
+            @RequestBody Job job) {
 
-        existingJob.setCompany(updatedJob.getCompany());
-        existingJob.setPosition(updatedJob.getPosition());
-        existingJob.setStatus(updatedJob.getStatus());
-        existingJob.setAppliedDate(updatedJob.getAppliedDate());
-        existingJob.setLocation(updatedJob.getLocation());
-        existingJob.setJobType(updatedJob.getJobType());
-        existingJob.setNotes(updatedJob.getNotes());
-
-        return jobRepository.save(existingJob);
+        return ResponseEntity.ok(jobService.updateJob(id, job));
     }
 
-    public void deleteJob(Long id) {
-        jobRepository.deleteById(id);
+    // DELETE job
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteJob(@PathVariable Long id) {
+
+        jobService.deleteJob(id);
+
+        return ResponseEntity.ok("Job deleted successfully");
     }
 
-    public List<Job> searchJobs(String keyword) {
-        return jobRepository
-                .findByCompanyContainingIgnoreCaseOrPositionContainingIgnoreCase(
-                        keyword,
-                        keyword
-                );
+    // SEARCH jobs
+    @GetMapping("/search")
+    public List<Job> searchJobs(@RequestParam String keyword) {
+        return jobService.searchJobs(keyword);
     }
 
-    public List<Job> getJobsByStatus(String status) {
-        return jobRepository.findByStatus(status);
+    // FILTER by status
+    @GetMapping("/status/{status}")
+    public List<Job> getJobsByStatus(@PathVariable String status) {
+        return jobService.getJobsByStatus(status);
     }
 }
